@@ -22,11 +22,11 @@ const MAX_PIXELS = 2600; // photos are downsampled past this, so drags stay ligh
 // panel from a tall photo that centring cuts the head in half.
 const CROP_PLAN = [
   { zoom: 1, tone: 0 },
-  { zoom: 1.12, tone: 0.05 },
-  { zoom: 1.24, tone: -0.05 },
-  { zoom: 1.16, tone: 0.07 },
-  { zoom: 1.06, tone: -0.04 },
-  { zoom: 1.2, tone: 0.06 },
+  { zoom: 1.22, tone: 0.04 },
+  { zoom: 1.5, tone: -0.05 },
+  { zoom: 1.34, tone: 0.07 },
+  { zoom: 1.12, tone: -0.03 },
+  { zoom: 1.6, tone: 0.05 },
 ];
 
 const $ = (id) => document.getElementById(id);

@@ -147,6 +147,10 @@ export function drawCaption(ctx, laid, box, palette, opts = {}) {
   ctx.lineJoin = 'round';
   ctx.miterLimit = 2;
 
+  // One gradient across the whole block, not one per line: a per-line ramp dips each word to a different depth and
+  // the stack stops reading as a single lockup.
+  const fill = bevelGradient(ctx, 0, top, Math.max(total, size), palette.title);
+
   lines.forEach((line, i) => {
     const m = metrics[i];
     const baseline = y + m.asc;
@@ -173,9 +177,8 @@ export function drawCaption(ctx, laid, box, palette, opts = {}) {
       ctx.strokeText(line, x, baseline);
     }
 
-    // Solid fill, with the sheen only at the very foot of the caps.
-    const grad = bevelGradient(ctx, 0, baseline - m.asc, m.asc + m.desc, palette.title);
-    ctx.fillStyle = grad;
+    // Solid fill from the shared block gradient, with the sheen only at the very foot of the caps.
+    ctx.fillStyle = fill;
     ctx.fillText(line, x, baseline);
 
     // Optional inline rule, a hair of light inside the stroke.
@@ -208,15 +211,17 @@ export function drawBand(ctx, text, rect, palette, opts = {}) {
   ctx.fillStyle = plate;
   ctx.fillRect(rect.x - rect.h * 2, rect.y, rect.w + rect.h * 2, rect.h);
 
-  // The accent tick hangs in the gutter to the left of the text, so the words themselves sit on the poster's
-  // single text margin instead of being pushed in by their own bullet.
+  // The accent tick sits on the same left margin as the title and the corner marks; the label starts after it, so
+  // the whole lower-left block shares one optical edge instead of drifting a few pixels per element.
+  const tickW = Math.max(3, rect.h * 0.11);
   ctx.fillStyle = palette.accent;
-  ctx.fillRect(rect.x - rect.h * 0.62, rect.y + rect.h * 0.1, Math.max(3, rect.h * 0.11), rect.h * 0.8);
+  ctx.fillRect(rect.x, rect.y + rect.h * 0.1, tickW, rect.h * 0.8);
+  const textX = rect.x + tickW + rect.h * 0.34;
 
   if (label) {
     let size = rect.h * 0.5;
     setFont(ctx, size, CONDENSED, 700, 0.2);
-    const max = rect.w - rect.h * 0.2;
+    const max = rect.w - (textX - rect.x) - rect.h * 0.2;
     let w = ctx.measureText(label).width;
     while (w > max && size > rect.h * 0.24) {
       size *= 0.94;
@@ -226,7 +231,7 @@ export function drawBand(ctx, text, rect, palette, opts = {}) {
     ctx.fillStyle = '#fbf7f2';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'left';
-    ctx.fillText(label, rect.x, rect.y + rect.h * 0.52);
+    ctx.fillText(label, textX, rect.y + rect.h * 0.52);
   }
   ctx.restore();
 }
